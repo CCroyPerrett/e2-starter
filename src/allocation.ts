@@ -32,17 +32,67 @@ function updateDisplay(shiftres: shift_result) {
   ctx.fillStyle = "#233e43";
   ctx.font = "14px system-ui";
   ctx.fillText(`Producers: ${numofproducers} / 6`, 18, 76);
-  ctx.fillText(`Production: ${shiftresults.production}`, 18, 102);
-  ctx.fillStyle = "#27766b";
-  ctx.fillRect(18, 110, shiftres.production * 14, 20);
-  ctx.fillStyle = "#233e43";
-  ctx.fillText(`Consumption: ${shiftres.consumption}`, 18, 154);
-  ctx.fillStyle = "#a44d23";
-  ctx.fillRect(18, 162, shiftres.consumption * 14, 20);
+
+  if (shiftresults.production >= shiftres.consumption) { //production first order
+    drawRow(
+      `Production: ${shiftresults.production}`,
+      18,
+      102,
+      "#27766b",
+      18,
+      110,
+      shiftres.production * 14,
+    );
+    ctx.fillStyle = "#233e43";
+    drawRow(
+      `Consumption: ${shiftres.consumption}`,
+      18,
+      154,
+      "#a44d23",
+      18,
+      162,
+      shiftres.consumption * 14,
+    );
+  } else { //consumption first order
+    drawRow(
+      `Production: ${shiftresults.production}`,
+      18,
+      154,
+      "#27766b",
+      18,
+      162,
+      shiftres.production * 14,
+    );
+    ctx.fillStyle = "#233e43";
+    drawRow(
+      `Consumption: ${shiftres.consumption}`,
+      18,
+      102,
+      "#a44d23",
+      18,
+      110,
+      shiftres.consumption * 14,
+    );
+  }
+
   readout.textContent =
     `Assigned: ${numofproducers}/6 · Production: ${shiftres.production} · Consumption: ${shiftres.consumption} · Balance: ${
       shiftres.balance > 0 ? "+" : ""
     }${shiftres.balance}`;
+}
+
+function drawRow(
+  textcontext: string,
+  textposx: number,
+  textposy: number,
+  fillstyle: string,
+  barx: number,
+  bary: number,
+  barwidth: number,
+) {
+  ctx.fillText(textcontext, textposx, textposy);
+  ctx.fillStyle = fillstyle;
+  ctx.fillRect(barx, bary, barwidth, 20);
 }
 
 document.querySelector<HTMLButtonElement>("#allocation-less")!.onclick = () => {
