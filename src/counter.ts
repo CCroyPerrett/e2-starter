@@ -18,11 +18,28 @@ type ShieldData = {
   capacity: number;
   missingcharge: number;
 };
-let shielddata: ShieldData = {
+const shielddata: ShieldData = {
   currentcharge: 0,
   capacity: 10,
   missingcharge: 10,
 };
+
+class ShieldListener extends EventTarget {
+  constructor() {
+    super();
+  }
+
+  triggerEvent() {
+    const event = new CustomEvent("shieldChanged", {});
+    this.dispatchEvent(event);
+  }
+}
+
+const shieldlisten = new ShieldListener();
+shieldlisten.addEventListener("shieldChanged", (event) => {
+  drawMeter();
+});
+shieldlisten.triggerEvent();
 
 function drawMeter() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -33,7 +50,6 @@ function drawMeter() {
   ctx.fillStyle = "#233e43";
   ctx.font = "16px system-ui";
   ctx.fillText(`${shielddata.currentcharge} / 10 Total Charge`, 12, 100);
-  //readout.textContent = `Shield charge: ${shielddata.currentcharge} / 10`;
 }
 
 function updateStats() {
@@ -53,7 +69,7 @@ function setCount(next: number) {
   if (bounded === shielddata.currentcharge) return;
   shielddata.currentcharge = bounded;
   shielddata.missingcharge = 10 - bounded;
-  drawMeter();
+  shieldlisten.triggerEvent();
   if (panel) updateStats();
 }
 
@@ -77,4 +93,4 @@ document.querySelector<HTMLButtonElement>("#counter-close")!.onclick = () => {
   panel.remove();
   panel = null;
 };
-drawMeter();
+shieldlisten.triggerEvent();
