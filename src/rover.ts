@@ -36,6 +36,8 @@ type Command = {
   moveforward: boolean;
   turnright: boolean;
 };
+let storedCommands: Command[] = [];
+
 const routePlanning = [{ newx: 0, newy: -1, dir: "up" }, {
   newx: 1,
   newy: 0,
@@ -58,20 +60,49 @@ function doCommand(newCommand: Command) {
   }
 }
 
+const commandlist = document.querySelector<HTMLButtonElement>("#command-list");
+function updateCommandList() {
+  let newtext = "Command List: ";
+  for (let i = 0; i < storedCommands.length; i++) {
+    if (storedCommands[i].moveforward) newtext += "forward, ";
+    if (storedCommands[i].turnright) newtext += "right, ";
+  }
+  commandlist!.textContent = newtext;
+}
+
 document.querySelector<HTMLButtonElement>("#rover-forward")!.onclick = () => {
   const newCommand = { moveforward: true, turnright: false };
-  doCommand(newCommand);
+  storedCommands.push(newCommand);
   drawRover();
+  updateCommandList();
 };
 document.querySelector<HTMLButtonElement>("#rover-right")!.onclick = () => {
   const newCommand = { moveforward: false, turnright: true };
-  doCommand(newCommand);
+  storedCommands.push(newCommand);
   drawRover();
+  updateCommandList();
 };
 document.querySelector<HTMLButtonElement>("#rover-reset")!.onclick = () => {
   x = 2;
   y = 2;
   direction = 0;
+  storedCommands = [];
   drawRover();
+  updateCommandList();
 };
+
+document.querySelector<HTMLButtonElement>("#rover-run")!.onclick = () => {
+  for (let i = 0; i < storedCommands.length; i++) {
+    doCommand(storedCommands[i]);
+  }
+  storedCommands = [];
+  drawRover();
+  updateCommandList();
+};
+document.querySelector<HTMLButtonElement>("#rover-clear")!.onclick = () => {
+  storedCommands = [];
+  drawRover();
+  updateCommandList();
+};
+
 drawRover();
