@@ -2,9 +2,6 @@ export {};
 
 const canvas = document.querySelector<HTMLCanvasElement>("#counter-canvas")!;
 const ctx = canvas.getContext("2d")!;
-const readout = document.querySelector<HTMLParagraphElement>(
-  "#counter-readout",
-)!;
 const host = document.querySelector<HTMLDivElement>("#counter-panel-host")!;
 const diagnostic = document.querySelector<HTMLParagraphElement>(
   "#counter-diagnostic",
@@ -29,9 +26,15 @@ class ShieldListener extends EventTarget {
     super();
   }
 
-  triggerEvent() {
-    const event = new CustomEvent("shieldChanged", {});
-    this.dispatchEvent(event);
+  triggerEvent(dometer: boolean, doinspect: boolean) {
+    if (dometer) {
+      const event = new CustomEvent("shieldChanged", {});
+      this.dispatchEvent(event);
+    }
+    if (doinspect) {
+      const event = new CustomEvent("inspection", {});
+      this.dispatchEvent(event);
+    }
   }
 }
 
@@ -39,7 +42,10 @@ const shieldlisten = new ShieldListener();
 shieldlisten.addEventListener("shieldChanged", (event) => {
   drawMeter();
 });
-shieldlisten.triggerEvent();
+shieldlisten.addEventListener("inspection", (event) => {
+  renderStats();
+});
+shieldlisten.triggerEvent(true, false);
 
 function drawMeter() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -55,7 +61,7 @@ function drawMeter() {
 function updateStats() {
   panelUpdates++;
   diagnostic.textContent = `Inspector deliveries: ${panelUpdates}`;
-  renderStats();
+  shieldlisten.triggerEvent(false, true);
 }
 
 function renderStats() {
@@ -69,7 +75,7 @@ function setCount(next: number) {
   if (bounded === shielddata.currentcharge) return;
   shielddata.currentcharge = bounded;
   shielddata.missingcharge = 10 - bounded;
-  shieldlisten.triggerEvent();
+  shieldlisten.triggerEvent(true, false);
   if (panel) updateStats();
 }
 
@@ -86,11 +92,11 @@ document.querySelector<HTMLButtonElement>("#counter-open")!.onclick = () => {
   if (panel) return;
   panel = document.createElement("p");
   host.append(panel);
-  renderStats();
+  shieldlisten.triggerEvent(false, true);
 };
 document.querySelector<HTMLButtonElement>("#counter-close")!.onclick = () => {
   if (!panel) return;
   panel.remove();
   panel = null;
 };
-shieldlisten.triggerEvent();
+shieldlisten.triggerEvent(true, false);
