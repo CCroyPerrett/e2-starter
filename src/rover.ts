@@ -36,12 +36,22 @@ type Command = {
   moveforward: boolean;
   turnright: boolean;
 };
+const routePlanning = [{ newx: 0, newy: -1, dir: "up" }, {
+  newx: 1,
+  newy: 0,
+  dir: "right",
+}, {
+  newx: 0,
+  newy: 1,
+  dir: "down",
+}, { newx: -1, newy: 0, dir: "left" }];
+
 function doCommand(newCommand: Command) {
   if (newCommand.moveforward) {
-    if (direction === 0) y = Math.max(0, y - 1);
-    if (direction === 1) x = Math.min(4, x + 1);
-    if (direction === 2) y = Math.min(4, y + 1);
-    if (direction === 3) x = Math.max(0, x - 1);
+    const newx = x + routePlanning[direction].newx;
+    const newy = y + routePlanning[direction].newy;
+    if (newx >= 0 && newx <= 4) x = newx;
+    if (newy >= 0 && newy <= 4) y = newy;
   }
   if (newCommand.turnright) {
     direction = (direction + 1) % 4;
