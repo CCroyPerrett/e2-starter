@@ -39,10 +39,10 @@ class ShieldListener extends EventTarget {
 }
 
 const shieldlisten = new ShieldListener();
-shieldlisten.addEventListener("shieldChanged", (event) => {
+shieldlisten.addEventListener("shieldChanged", () => {
   drawMeter();
 });
-shieldlisten.addEventListener("inspection", (event) => {
+shieldlisten.addEventListener("inspection", () => {
   renderStats();
 });
 shieldlisten.triggerEvent(true, false);
